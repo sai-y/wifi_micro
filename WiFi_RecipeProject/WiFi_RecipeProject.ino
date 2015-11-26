@@ -29,6 +29,7 @@
 char ssid[] = "Hogwarts";
 // your network password
 char password[] = "Expectopatronum1987";
+char server[] = "dot.ca.gov";
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 
@@ -40,7 +41,7 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing pack
 
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP Udp;
-
+WiFiClient client;
 void setup()
 {
   // Open serial communications and wait for port to open:
@@ -72,11 +73,33 @@ void setup()
   // you're connected now, so print out the status  
   printWifiStatus();
 
+  if(client.connect(server, 80)){
+    Serial.println("Connected to server");
+    client.println("GET /hq/roadinfo/sr108 HTTP/1.1");
+    client.println("Host: energia.nu");
+    client.println("Connection: close");
+    client.println();
+    
+  }
  
 }
 
 void loop()
 {
+  while (client.available()) {
+    char c = client.read();
+    Serial.write(c);
+  }
+
+  // if the server's disconnected, stop the client:
+  if (!client.connected()) {
+    Serial.println();
+    Serial.println("disconnecting from server.");
+    client.stop();
+
+    // do nothing forevermore:
+    while (true);
+  }
 }
 
 // send an NTP request to the time server at the given address
