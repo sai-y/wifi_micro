@@ -45,7 +45,7 @@ void setup()
 {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
-
+  while(!Serial);
   // attempt to connect to Wifi network:
   Serial.print("Attempting to connect to Network named: ");
   // print the network name (SSID);
